@@ -282,7 +282,7 @@ def main(args):
     """main function to call from workflow"""
     # tuning lr and wd first:
     lr_range, wd_range = get_lrwd_range(args)
-    if lr == None and wd == None:
+    if lr_range == None and wd_range == None:
         try:
             cfg = setup(args, None, None, final_runs=False)
         except ValueError:
