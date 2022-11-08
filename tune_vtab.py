@@ -262,7 +262,9 @@ def get_lrwd_range(args):
             1.0, 2.5, 5.
         ]
         wd_range = [0.01, 0.001, 0.0001, 0.0]
-
+    elif args.train_type == "LMQ_custom_training":
+        lr_range = [10.0, 5.0, 2.5, 1.0, 0.5]
+        wd_range = [0.001, 0.0001, 0.0]
     return lr_range, wd_range
 
 
