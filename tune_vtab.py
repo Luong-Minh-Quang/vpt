@@ -97,9 +97,11 @@ def setup(args, lr, wd, final_runs, run_idx=None, seed=None):
         cfg.RUN_N_TIMES = 1
         cfg.MODEL.SAVE_CKPT = False
         cfg.OUTPUT_DIR = cfg.OUTPUT_DIR + "_val"
-        lr = lr / 256 * cfg.DATA.BATCH_SIZE  # update lr based on the batchsize
-        cfg.SOLVER.BASE_LR = lr
-        cfg.SOLVER.WEIGHT_DECAY = wd
+        if lr:
+            lr = lr / 256 * cfg.DATA.BATCH_SIZE  # update lr based on the batchsize
+            cfg.SOLVER.BASE_LR = lr
+        if wd:
+            cfg.SOLVER.WEIGHT_DECAY = wd
         
     else:
         cfg.RUN_N_TIMES = 5
@@ -269,6 +271,9 @@ def get_lrwd_range(args):
     elif args.train_type == "WDsearch":
         lr_range = [1.0]
         wd_range = [0.001,0.0001, 0.0]
+    else:
+        lr_range = None
+        wd_range = None
     return lr_range, wd_range
 
 
@@ -277,7 +282,14 @@ def main(args):
     """main function to call from workflow"""
     # tuning lr and wd first:
     lr_range, wd_range = get_lrwd_range(args)
-
+    if lr == None and wd == None:
+        try:
+            cfg = setup(args, None, None, final_runs=False)
+        except ValueError:
+            # already ran
+            pass
+        train(cfg, args, final_runs=False)
+        
     for lr in sorted(lr_range, reverse=True):
         for wd in sorted(wd_range, reverse=True):
             try:
