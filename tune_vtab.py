@@ -100,7 +100,7 @@ def setup(args, lr, wd, final_runs, run_idx=None, seed=None):
         lr = lr / 256 * cfg.DATA.BATCH_SIZE  # update lr based on the batchsize
         cfg.SOLVER.BASE_LR = lr
         cfg.SOLVER.WEIGHT_DECAY = wd
-
+        
     else:
         cfg.RUN_N_TIMES = 5
         cfg.MODEL.SAVE_CKPT = False
@@ -262,10 +262,15 @@ def get_lrwd_range(args):
             1.0, 2.5, 5.
         ]
         wd_range = [0.01, 0.001, 0.0001, 0.0]
-    elif args.train_type == "LMQ_custom_training":
+    
+    elif args.train_type == "LRsearch":
         lr_range = [10.0, 5.0, 2.5, 1.0, 0.5]
         wd_range = [0.0001]
+    elif args.train_type == "WDsearch":
+        lr_range = [1.0]
+        wd_range = [0.001,0.0001, 0.0]
     return lr_range, wd_range
+
 
 
 def main(args):
@@ -283,7 +288,7 @@ def main(args):
             train(cfg, args, final_runs=False)
 
     # final run 5 times with fixed seed
-    random_seeds = [42, 44, 82, 100, 800]
+    random_seeds = [42]
     for run_idx, seed in enumerate(random_seeds):
         try:
             cfg = setup(
